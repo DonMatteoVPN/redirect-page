@@ -224,13 +224,15 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const currentURL = window.location.href;
+            const searchParams = new URLSearchParams(window.location.search);
             let redirectTo = decodeURIComponent(currentURL.split('redirect_to=')[1] || '');
             const language = navigator.language || navigator.userLanguage;
             const isRussian = language.startsWith('ru');
+            const displayUrlOff = searchParams.has('off');
 
             const titleText = isRussian ? 'Перенаправление' : 'Redirect Page';
             const subtitleText = isRussian ? 'Пожалуйста, подождите...' : 'Please wait while we redirect you';
-            const buttonText = isRussian ? 'Перейти сейчас' : 'Continue Now';
+            const buttonText = isRussian ? 'Продолжить сейчас' : 'Continue Now';
             const statusLabel = isRussian ? 'Статус' : 'Status';
             const statusValue = isRussian ? 'Перенаправление' : 'Redirecting';
             const timerLabel = isRussian ? 'Время до перехода' : 'Time remaining';
@@ -244,15 +246,22 @@
             document.getElementById('status-value').innerText = statusValue;
             document.getElementById('timer-label').innerText = timerLabel;
             document.getElementById('destination-label').innerText = destinationLabel;
-            document.getElementById('destination-url').innerText = redirectTo || (isRussian ? 'Не указан' : 'Not specified');
+            
+            const urlDisplayElement = document.getElementById('destination-url');
+            if (displayUrlOff) {
+                urlDisplayElement.innerText = isRussian ? 'Сейчас произойдет подключение вашего профиля' : 'Your profile will be connected shortly';
+            } else {
+                urlDisplayElement.innerText = redirectTo || (isRussian ? 'Не указан' : 'Not specified');
+            }
 
+            let interval;
             if (redirectTo) {
                 let countdown = 7;
                 const timerElement = document.getElementById('timer');
 
                 timerElement.innerText = countdown;
 
-                const interval = setInterval(() => {
+                interval = setInterval(() => {
                     countdown--;
                     timerElement.innerText = countdown;
 
@@ -261,6 +270,10 @@
                         window.location.href = redirectTo;
                     }
                 }, 1000);
+
+                document.getElementById('redirectLink').addEventListener('click', function() {
+                    clearInterval(interval);
+                });
             } else {
                 document.getElementById('timer').innerText = '—';
                 alert(isRussian ? 'Не указана ссылка для перенаправления.' : 'No redirect link specified.');
