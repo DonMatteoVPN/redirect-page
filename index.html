@@ -72,13 +72,11 @@
                 theme = 'telegram';
             }
 
-            // Build the theme URL
-            let themeURL = `themes/${theme}.html`;
+            // Get the original query string from the current URL
+            const originalQueryString = window.location.search;
 
-            // Append redirect_to parameter if it exists
-            if (redirectTo) {
-                themeURL += `?redirect_to=${encodeURIComponent(redirectTo)}`;
-            }
+            // Build the theme URL and append the original query string to preserve all parameters
+            const themeURL = `themes/${theme}.html${originalQueryString}`;
 
             // Redirect to the theme
             window.location.replace(themeURL);
